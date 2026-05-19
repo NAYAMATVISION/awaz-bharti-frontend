@@ -9,12 +9,12 @@ import NewsCard from "./components/NewsCard";
 import Footer from "./components/Footer";
 import { getImageUrl } from "../lib/utils";
 
+export const dynamic = 'force-dynamic';
+
 async function getData(endpoint) {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
   try {
-    const res = await fetch(`${baseUrl}${endpoint}`, {
-      next: { revalidate: 60 }, // cache for 60s, revalidate in background
-    });
+    const res = await fetch(`${baseUrl}${endpoint}`, { cache: 'no-store' });
     const result = await res.json();
     return result.success ? result.data : null;
   } catch (error) {
