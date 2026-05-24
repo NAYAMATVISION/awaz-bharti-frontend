@@ -23,10 +23,12 @@ async function getData(endpoint) {
   }
 }
 
+const stripHtml = (html) => (html || '').replace(/<[^>]*>/g, '').replace(/&[a-z]+;/gi, ' ').trim();
+
 const mapArticle = (article) => ({
   id: article._id,
   title: article.title,
-  description: article.content.substring(0, 150) + "...",
+  description: article.subheading || (stripHtml(article.content).substring(0, 150) + "..."),
   content: article.content,
   image: getImageUrl(article.image),
   badge: article.category?.charAt(0).toUpperCase() + article.category?.slice(1),
@@ -63,9 +65,13 @@ export default async function HomePage() {
   }).filter(s => s.featured);
 
   const mappedLive = (liveUpdates || []).map(update => ({
+    id: update._id,
+    slug: update.slug,
     time: new Date(update.timestamp).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
     headline: update.title,
-    description: update.content,
+    excerpt: update.excerpt,
+    description: update.content?.replace(/<[^>]*>/g, '').substring(0, 120),
+    coverImage: update.coverImage,
   }));
 
   const mappedVideos = (videos || []).map(v => ({
